@@ -1,5 +1,6 @@
 import torch.nn as nn
 
+
 # Define SE module
 class SEBlock(nn.Module):
     def __init__(self, channels, reduction=16):
@@ -61,9 +62,9 @@ class CNN(nn.Module):
         return x
 
 
-class ACNN(nn.Module):
+class SE_CNN(nn.Module):
     def __init__(self, num_classes):
-        super(ACNN, self).__init__()
+        super(SE_CNN, self).__init__()
         # First convolutional layer + SE module
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
         self.bn1 = nn.BatchNorm2d(32)

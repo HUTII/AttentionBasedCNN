@@ -1,6 +1,7 @@
 from tqdm import tqdm
 import torch
 import sys
+import os
 
 
 def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs=10, patience=4):
@@ -12,6 +13,11 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
 
     train_losses = []
     val_losses = []
+
+    model_save_path = 'best_model.pth'
+    if os.path.exists(model_save_path):
+        print(f"Deleting previous model file at {model_save_path}...\n")
+        os.remove(model_save_path)
 
     for epoch in range(num_epochs):
         model.train()
@@ -47,7 +53,8 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             patience_counter = 0
-            print(f"Validation Loss improved to {best_val_loss:.4f}.\n")
+            torch.save(model.state_dict(), model_save_path)
+            print(f"Validation Loss improved to {best_val_loss:.4f}. Model saved.\n")
         else:
             patience_counter += 1
             print(f"Validation Loss did not improve. Patience counter: {patience_counter}/{patience}\n")
@@ -56,6 +63,10 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
             print("Early stopping triggered.\n")
             break
 
+    if os.path.exists(model_save_path):
+        print("Loading the best model from checkpoint...\n")
+        model.load_state_dict(torch.load(model_save_path, weights_only=True))
+        model.to(device)
     return train_losses, val_losses
 
 
